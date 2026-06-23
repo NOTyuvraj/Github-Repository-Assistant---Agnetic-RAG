@@ -7,6 +7,6 @@
 
 
 import { chunker } from "./ingestion/chunker.js";
-const filePath = 'D:\\Python\\Github Repository Asistant - Agentic RAG\\server\\ingestion\\filter.js';
+const filePath = 'D:/Python/Github Repository Asistant - Agentic RAG/server/README.md';
 // console.log(chunker(filePath));
 console.log(await chunker(filePath));
