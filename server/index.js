@@ -6,7 +6,12 @@
 // console.log(await filter(path));
 
 
-import { chunker } from "./ingestion/chunker.js";
-const filePath = 'D:/Python/Github Repository Asistant - Agentic RAG/server/package.json';
-// console.log(chunker(filePath));
-console.log(await chunker(filePath));
+// import { chunker } from "./ingestion/chunker.js";
+// const filePath = 'D:/Python/Github Repository Asistant - Agentic RAG/server/package.json';
+// // console.log(chunker(filePath));
+// console.log(await chunker(filePath));
+
+
+import {ingestionOrchestrator} from "./ingestion/ingestion.orchestrator.js";
+const repoUrl = 'https://github.com/NOTyuvraj/research-agent';
+console.log( await ingestionOrchestrator(repoUrl));
