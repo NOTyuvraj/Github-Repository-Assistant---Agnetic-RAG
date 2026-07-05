@@ -21,7 +21,7 @@ export default function App() {
     setSuccess(false);
 
     try {
-      const response = await axios.post("http://localhost:1010/ingest", {
+      const response = await axios.post("https://github-repository-assistant-agnetic-rag.onrender.com/ingest", {
         repoURL,
       });
       if (response.data.success) setSuccess(true);
@@ -42,7 +42,7 @@ export default function App() {
     setAskLoading(true);
 
     try{
-      const response = await axios.post("http://localhost:1010/ask", {query});
+      const response = await axios.post("https://github-repository-assistant-agnetic-rag.onrender.com/ask", {query});
       setAnswer(response.data);
     }catch(err){
       setError(`Error : ${err}`)
