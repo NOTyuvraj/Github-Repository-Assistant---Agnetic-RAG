@@ -129,6 +129,7 @@ Update the API base URL in `App.jsx` to `http://localhost:1010` for local develo
 
 - Re-ingestion required if the repo is updated — no automatic sync
 - JS chunker handles exported functions and function declarations; some edge cases (class methods, default exports) may be skipped
+- Only `.js`, `.ts`, `.md`, and `.json` files are ingested. Other types (`.py`, `.go`, `.tsx`, `.css`, etc.) are skipped — answers about those files won't be available
 - Pinecone free tier has vector limits — large repos may hit the ceiling
 
 ---
