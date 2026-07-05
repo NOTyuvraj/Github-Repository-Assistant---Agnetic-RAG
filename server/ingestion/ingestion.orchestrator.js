@@ -4,6 +4,8 @@ import { cloneRepo } from "./cloner.js";
 import { embedder } from "./embedder.js";
 
 import { rm } from "node:fs/promises";
+import path from "node:path";
+import { Pinecone } from "@pinecone-database/pinecone";
 
 export const ingestionOrchestrator = async (repoURL) => {
   try {
@@ -13,9 +15,17 @@ export const ingestionOrchestrator = async (repoURL) => {
     for (const file of filesPath) {
       chunks.push(...(await chunker(file)));
     }
-    console.log("files found:", filesPath.length);
-    console.log("chunks found:", chunks.length);
+
+    chunks.forEach(chunk => {
+      chunk.filePath = path.relative(cloneDir, chunk.filePath);
+    })
+
     await rm(cloneDir, { recursive: true, force: true });
+
+    const index = new Pinecone({apiKey: process.env.PINECONE_API_KEY}).index(process.env.PINECONE_INDEX , process.env.PINECONE_HOST);
+
+    await index.deleteAll();
+
     await embedder(chunks);
   } catch (err) {
     throw err;

@@ -3,7 +3,6 @@ import { readFile } from "node:fs/promises";
 
 export const jsChunker = async (filePath) => {
   try {
-    console.log(filePath);
     const code = await readFile(filePath, "utf-8");
     const parsedCode = parser.parse(code, {
       locations: true,

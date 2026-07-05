@@ -36,7 +36,6 @@ export const agent = async (query) => {
       ];
       const response = await callAgent(messages);
       const message = response.choices[0].message;
-      // console.log(message.content);
       if (message.content == "YES") break;
       iterations++;
     } catch (err) {
