@@ -131,7 +131,7 @@ export default function App() {
           {askLoading && <p className="mt-6 text-zinc-400">Thinking...</p>}
 
           {answer && (
-            <div className="mt-8 border border-zinc-800 rounded-xl bg-black p-6 max-h-[450px] overflow-y-auto">
+            <div className="mt-8 border border-zinc-800 rounded-xl bg-black p-6 ">
               <div className="text-sm uppercase tracking-widest text-zinc-500 mb-4">
                 Answer
               </div>
