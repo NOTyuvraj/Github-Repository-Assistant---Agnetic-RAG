@@ -23,7 +23,9 @@ export default function App() {
     try {
       const response = await axios.post(
         "https://github-repository-assistant-agnetic-rag.onrender.com/ingest",
-        { repoURL },
+        {
+          repoURL,
+        },
       );
 
       if (response.data.success) setSuccess(true);
@@ -36,7 +38,7 @@ export default function App() {
 
   const handleQuery = async () => {
     if (!query.trim()) {
-      setError("Enter a question.");
+      setError("Please enter a question.");
       return;
     }
 
@@ -46,7 +48,9 @@ export default function App() {
     try {
       const response = await axios.post(
         "https://github-repository-assistant-agnetic-rag.onrender.com/ask",
-        { query },
+        {
+          query,
+        },
       );
 
       setAnswer(response.data);
@@ -58,88 +62,92 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-6 py-10">
-      <div className="w-full max-w-4xl space-y-8">
+    <div className="min-h-screen bg-black text-white flex items-center justify-center px-6 py-10">
+      <div className="w-full max-w-5xl space-y-8">
         {/* Header */}
-        <div className="text-center">
+        <div className="text-center space-y-3">
           <h1 className="text-5xl font-bold tracking-tight">
             GitHub Repository Assistant
           </h1>
 
-          <p className="text-slate-400 mt-3">
-            Ingest any GitHub repository and ask questions about its codebase.
+          <p className="text-zinc-500 text-lg">
+            Ingest any GitHub repository and chat with its codebase.
           </p>
         </div>
 
-        {/* Ingest Card */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-xl">
-          <h2 className="text-2xl font-semibold mb-6">Repository Ingestion</h2>
+        {/* Repository Card */}
+        <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-8 hover:border-zinc-700 transition">
+          <h2 className="text-2xl font-semibold mb-6">Repository</h2>
 
           <div className="flex flex-col md:flex-row gap-4">
             <input
+              type="text"
+              placeholder="Paste GitHub repository URL..."
               value={repoURL}
               onChange={(e) => setRepoURL(e.target.value)}
-              placeholder="https://github.com/user/repository"
-              className="flex-1 rounded-xl bg-slate-950 border border-slate-700 px-4 py-3 outline-none focus:border-violet-500 transition"
+              className="flex-1 bg-black border border-zinc-800 rounded-xl px-5 py-3 placeholder:text-zinc-600 outline-none focus:border-white transition"
             />
 
             <button
               onClick={handleIngest}
-              className="px-6 py-3 rounded-xl bg-violet-600 hover:bg-violet-500 transition font-medium"
+              className="bg-white text-black font-semibold rounded-xl px-7 py-3 hover:bg-zinc-200 active:scale-95 transition"
             >
-              Ingest Repository
+              Ingest
             </button>
           </div>
 
           {loading && (
-            <p className="mt-5 text-violet-400">⏳ Ingesting repository...</p>
+            <p className="mt-5 text-zinc-400">Indexing repository...</p>
           )}
 
           {success && (
             <p className="mt-5 text-green-400">
-              ✓ Repository indexed successfully
+              ✓ Repository indexed successfully.
             </p>
           )}
-
-          {error && <p className="mt-5 text-red-400">{error}</p>}
         </div>
 
         {/* Chat Card */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-xl">
+        <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-8 hover:border-zinc-700 transition">
           <h2 className="text-2xl font-semibold mb-6">Ask Questions</h2>
 
           <div className="flex flex-col md:flex-row gap-4">
             <input
+              type="text"
+              placeholder="Ask anything about the repository..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="How does authentication work?"
-              className="flex-1 rounded-xl bg-slate-950 border border-slate-700 px-4 py-3 outline-none focus:border-violet-500 transition"
+              className="flex-1 bg-black border border-zinc-800 rounded-xl px-5 py-3 placeholder:text-zinc-600 outline-none focus:border-white transition"
             />
 
             <button
               onClick={handleQuery}
-              className="px-6 py-3 rounded-xl bg-violet-600 hover:bg-violet-500 transition font-medium"
+              className="bg-white text-black font-semibold rounded-xl px-7 py-3 hover:bg-zinc-200 active:scale-95 transition"
             >
               Ask
             </button>
           </div>
 
-          {askLoading && <p className="mt-5 text-violet-400">🤖 Thinking...</p>}
+          {askLoading && <p className="mt-6 text-zinc-400">Thinking...</p>}
 
           {answer && (
-            <div className="mt-6 rounded-xl bg-slate-950 border border-slate-800 p-5">
-              <h3 className="text-lg font-semibold mb-3 text-violet-400">
+            <div className="mt-8 border border-zinc-800 rounded-xl bg-black p-6 max-h-[450px] overflow-y-auto">
+              <div className="text-sm uppercase tracking-widest text-zinc-500 mb-4">
                 Answer
-              </h3>
+              </div>
 
-              <p className="text-slate-300 whitespace-pre-wrap leading-7">
+              <p className="whitespace-pre-wrap leading-8 text-zinc-200">
                 {answer}
               </p>
             </div>
           )}
-
-          {error && <p className="mt-5 text-red-400">{error}</p>}
         </div>
+
+        {error && (
+          <div className="rounded-xl border border-red-900 bg-red-950/30 p-4">
+            <p className="text-red-400">{error}</p>
+          </div>
+        )}
       </div>
     </div>
   );
