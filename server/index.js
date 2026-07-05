@@ -1,10 +1,4 @@
-// import dotenv from "dotenv/config"
-// import { agent } from "./retrieval/agent.js";
-// import {ingestionOrchestrator} from "./ingestion/ingestion.orchestrator.js";
-// const repoUrl = 'https://github.com/NOTyuvraj/research-agent';
-// await ingestionOrchestrator(repoUrl);
-// const query = "how does scrapeUrl works ?"
-// console.log(await agent(query));
+
 
 import dotenv from "dotenv/config";
 
@@ -29,8 +23,8 @@ app.post("/ingest", async (req, res) => {
   if (!repoURL) return res.status(400).json({ error: "url is required" });
 
   try {
-    await ingestionOrchestrator(repoURL);
-    return res.json({ success: true });
+    const sessionId = await ingestionOrchestrator(repoURL);
+    return res.json({ success: true, sessionId });
   } catch (err) {
     console.error("Orchestrator error: ", err.message);
     res.status(500).json({ error: err.message });
@@ -38,11 +32,11 @@ app.post("/ingest", async (req, res) => {
 });
 
 app.post("/ask", async (req, res) => {
-  const { query } = req.body;
+  const { query , sessionId} = req.body;
   if (!query) return res.status(400).json({ error: "query is required" });
 
   try {
-    res.send(await agent(query));
+    res.send(await agent(query , sessionId));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

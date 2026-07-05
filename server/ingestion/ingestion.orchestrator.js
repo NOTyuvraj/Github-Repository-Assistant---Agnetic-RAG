@@ -9,6 +9,7 @@ import { Pinecone } from "@pinecone-database/pinecone";
 
 export const ingestionOrchestrator = async (repoURL) => {
   try {
+    const sessionId = crypto.randomUUID();
     const cloneDir = await cloneRepo(repoURL);
     const filesPath = await filter(cloneDir);
     const chunks = [];
@@ -24,9 +25,8 @@ export const ingestionOrchestrator = async (repoURL) => {
 
     const index = new Pinecone({apiKey: process.env.PINECONE_API_KEY}).index(process.env.PINECONE_INDEX , process.env.PINECONE_HOST);
 
-    await index.deleteAll();
-
-    await embedder(chunks);
+    await embedder(chunks, sessionId);
+    return sessionId;
   } catch (err) {
     throw err;
   }

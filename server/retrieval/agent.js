@@ -20,7 +20,7 @@ const callAgent = async (messages, retries = 3) => {
   }
 };
 
-export const agent = async (query) => {
+export const agent = async (query , sessionId) => {
   const chunks = await retriever(query);
 
   let iterations = 0;

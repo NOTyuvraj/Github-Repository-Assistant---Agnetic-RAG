@@ -1,10 +1,9 @@
 import { Pinecone } from "@pinecone-database/pinecone";
 import { VoyageAIClient } from "voyageai";
 
-export const embedder = async (chunks) => {
+export const embedder = async (chunks, sessionId) => {
   try {
     const client = new VoyageAIClient({ apiKey: process.env.VOYAGE_API_KEY });
-
     const result = await client.embed({
       input: chunks.map((chunk) => chunk.text),
       model: "voyage-code-2",
@@ -13,7 +12,7 @@ export const embedder = async (chunks) => {
       apiKey: process.env.PINECONE_API_KEY,
     });
 
-    const index = pc.index({host:process.env.PINECONE_HOST});
+    const index = pc.index({ host: process.env.PINECONE_HOST });
 
     const upsertArr = [];
     for (let i = 0; i < chunks.length; i++) {
@@ -29,7 +28,9 @@ export const embedder = async (chunks) => {
         },
       });
     }
-    await index.upsert({records:upsertArr});
+    const namespacedIndex = index.namespace(sessionId);
+    await namespacedIndex.upsert({ records: upsertArr });
+    
   } catch (err) {
     throw err;
   }

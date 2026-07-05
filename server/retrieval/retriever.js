@@ -1,8 +1,7 @@
 import { Pinecone } from "@pinecone-database/pinecone";
-import { log } from "node:console";
 import { VoyageAIClient } from "voyageai";
 
-export const retriever = async (query) => {
+export const retriever = async (query, sessionId) => {
   try {
     const client = new VoyageAIClient({ apiKey: process.env.VOYAGE_API_KEY });
     const result = await client.embed({
@@ -15,13 +14,12 @@ export const retriever = async (query) => {
 
     const index = pc.index({ host: process.env.PINECONE_HOST });
 
-    const queryResponse = await index.query({
+    const queryResponse = await index.namespace(sessionId).query({
         vector:result.data[0].embedding,
         topK:5,
         includeMetadata:true,
     })
 
-    // console.log(queryResponse.matches);
     return queryResponse.matches;
 
   } catch (err) {

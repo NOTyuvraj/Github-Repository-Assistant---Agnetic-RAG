@@ -9,6 +9,7 @@ export default function App() {
   const [query, setQuery] = useState("");
   const [answer, setAnswer] = useState("");
   const [askLoading, setAskLoading] = useState(false);
+  const [sessionId, setSessionId] = useState("");
 
   const handleIngest = async () => {
     if (!repoURL.trim()) {
@@ -29,6 +30,7 @@ export default function App() {
       );
 
       if (response.data.success) setSuccess(true);
+      setSessionId(response.data.sessionId);
     } catch (err) {
       setError(`Error: ${err}`);
     } finally {
@@ -50,6 +52,7 @@ export default function App() {
         "https://github-repository-assistant-agnetic-rag.onrender.com/ask",
         {
           query,
+          sessionId,
         },
       );
 
