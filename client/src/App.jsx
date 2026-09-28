@@ -23,8 +23,8 @@ export default function App() {
 
     try {
       const response = await axios.post(
-        // "https://github-repository-assistant-agnetic-rag.onrender.com/ingest",
-        "http://localhost:1010/ingest",
+        "https://github-repository-assistant-agnetic-rag.onrender.com/ingest",
+        // "http://localhost:1010/ingest",
         {
           repoURL,
           branch:"main"
@@ -51,8 +51,8 @@ export default function App() {
 
     try {
       const response = await axios.post(
-        // "https://github-repository-assistant-agnetic-rag.onrender.com/ask",
-        "http://localhost:1010/ask",
+        "https://github-repository-assistant-agnetic-rag.onrender.com/ask",
+        // "http://localhost:1010/ask",
         {
           query,
           sessionId,
