@@ -66,7 +66,7 @@ export const agent = async (query, sessionId) => {
 
     searchQuery = reformulateResponse.choices[0].message.content.trim();
 
-    console.log(`🔎 Retrieval iteration ${iteration + 1}`);
+    console.log(`🔎 Retrieval iteration ${i + 1}`);
     console.log(`New search query: ${searchQuery}`);
   }
 
