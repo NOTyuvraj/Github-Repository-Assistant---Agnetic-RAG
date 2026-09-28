@@ -23,16 +23,18 @@ export default function App() {
 
     try {
       const response = await axios.post(
-        "https://github-repository-assistant-agnetic-rag.onrender.com/ingest",
+        // "https://github-repository-assistant-agnetic-rag.onrender.com/ingest",
+        "http://localhost:1010/ingest",
         {
           repoURL,
+          branch:"main"
         },
       );
 
       if (response.data.success) setSuccess(true);
       setSessionId(response.data.sessionId);
     } catch (err) {
-      setError(`Error: ${err}`);
+      setError(`Error: ${err.response?.data?.error ?? err.message}`);
     } finally {
       setLoading(false);
     }
@@ -49,7 +51,8 @@ export default function App() {
 
     try {
       const response = await axios.post(
-        "https://github-repository-assistant-agnetic-rag.onrender.com/ask",
+        // "https://github-repository-assistant-agnetic-rag.onrender.com/ask",
+        "http://localhost:1010/ask",
         {
           query,
           sessionId,
@@ -58,7 +61,7 @@ export default function App() {
 
       setAnswer(response.data);
     } catch (err) {
-      setError(`Error: ${err}`);
+      setError(`Error: ${err.response?.data?.error ?? err.message}`);
     } finally {
       setAskLoading(false);
     }

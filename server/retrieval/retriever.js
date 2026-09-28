@@ -12,7 +12,7 @@ export const retriever = async (query, sessionId) => {
       apiKey: process.env.PINECONE_API_KEY,
     });
 
-    const index = pc.index({ host: process.env.PINECONE_HOST });
+    const index = pc.index(process.env.PINECONE_INDEX);
 
     const queryResponse = await index.namespace(sessionId).query({
         vector:result.data[0].embedding,
