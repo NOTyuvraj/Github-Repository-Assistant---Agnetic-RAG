@@ -27,7 +27,6 @@ export default function App() {
         "http://localhost:1010/ingest",
         {
           repoURL,
-          branch:"main"
         },
       );
 

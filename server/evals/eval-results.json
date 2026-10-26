@@ -1,0 +1,418 @@
+[
+  {
+    "id": "express-001",
+    "question": "How does Express create an application instance?",
+    "expectedAnswerPoints": [
+      "Creates a callable application function",
+      "Mixes in EventEmitter and application methods",
+      "Creates application-specific request and response prototypes",
+      "Calls app.init() before returning the application"
+    ],
+    "expectedEvidence": [
+      {
+        "filePath": "lib/express.js",
+        "symbol": "createApplication"
+      }
+    ],
+    "answerable": true,
+    "actualAnswer": "Express creates an application instance by exporting a function called **`createApplication`** from `lib/express.js`.  \nWhen you `require('express')`, the module’s `module.exports` is set to this `createApplication` function, so calling the exported value (`express()`) runs that function and returns a new Express application object.  \n\n```\nexports = module.exports = createApplication;\n```\n\nThis assignment is shown in `lib/express.js` lines 15‑81.",
+    "requestSucceeded": true,
+    "latencySeconds": 28.3
+  },
+  {
+    "id": "express-002",
+    "question": "How are app.request and app.response created, and how does each expose its application?",
+    "expectedAnswerPoints": [
+      "Creates app.request using Object.create with the base request prototype",
+      "Creates app.response using Object.create with the base response prototype",
+      "Defines an app property on each prototype that references the application"
+    ],
+    "expectedEvidence": [
+      {
+        "filePath": "lib/express.js",
+        "symbol": "createApplication"
+      }
+    ],
+    "answerable": true,
+    "actualAnswer": "The provided code does not show this.",
+    "requestSucceeded": true,
+    "latencySeconds": 31.69
+  },
+  {
+    "id": "express-003",
+    "question": "What does app.handle() do before delegating a request to the router?",
+    "expectedAnswerPoints": [
+      "Creates a finalhandler callback if no callback is provided",
+      "Links req.res and res.req",
+      "Sets request and response prototypes for the application",
+      "Initializes res.locals when needed",
+      "Delegates to this.router.handle(req, res, done)"
+    ],
+    "expectedEvidence": [
+      {
+        "filePath": "lib/application.js",
+        "symbol": "app.handle"
+      }
+    ],
+    "answerable": true,
+    "actualAnswer": "The provided code does not show this.",
+    "requestSucceeded": true,
+    "latencySeconds": 32.17
+  },
+  {
+    "id": "express-004",
+    "question": "How does app.use() parse its mount path and middleware arguments?",
+    "expectedAnswerPoints": [
+      "Defaults the mount path to slash when the first argument is not a path",
+      "Separates the mount path from middleware arguments",
+      "Flattens middleware arguments",
+      "Rejects invalid middleware arguments",
+      "Registers middleware with the router"
+    ],
+    "expectedEvidence": [
+      {
+        "filePath": "lib/application.js",
+        "symbol": "app.use"
+      }
+    ],
+    "answerable": true,
+    "actualAnswer": "The provided code does not show this.",
+    "requestSucceeded": true,
+    "latencySeconds": 40.55
+  },
+  {
+    "id": "express-005",
+    "question": "How does Express handle an error when app.handle() is called without a completion callback?",
+    "expectedAnswerPoints": [
+      "app.handle() creates a finalhandler callback when no callback is supplied",
+      "The completion handler is passed to the router",
+      "The route error tests demonstrate observable error-handling behavior",
+      "Does not claim that the external router implementation is defined in this repository"
+    ],
+    "expectedEvidence": [
+      {
+        "filePath": "lib/application.js",
+        "symbol": "app.handle"
+      },
+      {
+        "filePath": "test/app.routes.error.js",
+        "symbol": "route error handling tests"
+      }
+    ],
+    "answerable": true,
+    "actualAnswer": "The provided code does not show how Express handles an error when `app.handle()` is called without a completion callback. The relevant snippet only defines that `app` calls `app.handle(req, res, next)` but the implementation of `app.handle` (including any default `next` or error handling logic) is not included in the provided chunks.",
+    "requestSucceeded": true,
+    "latencySeconds": 58.58
+  },
+  {
+    "id": "express-006",
+    "question": "How do application creation and request handling work together to provide app-specific request and response behavior?",
+    "expectedAnswerPoints": [
+      "createApplication creates app.request and app.response",
+      "Each prototype exposes its application through an app property",
+      "app.handle assigns the application's prototypes to req and res",
+      "Request handling delegates to the router"
+    ],
+    "expectedEvidence": [
+      {
+        "filePath": "lib/express.js",
+        "symbol": "createApplication"
+      },
+      {
+        "filePath": "lib/application.js",
+        "symbol": "app.handle"
+      }
+    ],
+    "answerable": true,
+    "actualAnswer": "The Express application is created by requiring the module that exports the **app** object (`module.exports = app`).  \nThat object is a plain JavaScript object that receives a number of methods (one for each HTTP verb).  \nThose methods are defined by the following code in **lib/application.js** (lines 24‑33):\n\n```js\nmethods.forEach(function (method) {\n  if (method === 'get' && arguments.length === 1) {\n    // app.get(setting)\n    return this.set(path);\n  }\n\n  var route = this.route(path);\n  route[method].apply(route, slice.call(arguments, 1));\n  return this;\n});\n```\n\n* **Application creation** – The exported `app` object is what a user receives when they `require('express')()`; it becomes the central object on which routes and middleware are registered.  \n* **Request handling** – Each call to `app.get()`, `app.post()`, etc., creates a **route** via `this.route(path)` and attaches the supplied handlers to that route (`route[method]`).  \n* **Dispatching** – The module also requires a `Router` (`var Router = require('router');` – lines 16‑17), which is the component that actually receives an incoming HTTP request, looks up the matching route, and invokes the associated handlers.  \n\nThus, the combination of an *app* object that registers route handlers and a *Router* that dispatches incoming requests allows an Express application to provide request‑specific and response‑specific behavior. The `app` object is created once and used to configure routes; the `Router` uses that configuration to process each request and produce the appropriate response.",
+    "requestSucceeded": true,
+    "latencySeconds": 57.29
+  },
+  {
+    "id": "express-007",
+    "question": "What does Express do when app.use() mounts another Express application?",
+    "expectedAnswerPoints": [
+      "Recognizes a mounted Express application",
+      "Sets the mounted application's mountpath and parent",
+      "Wraps the mounted application's handler",
+      "Restores the original request and response prototypes after the mounted app callback",
+      "Emits the mount event on the child application"
+    ],
+    "expectedEvidence": [
+      {
+        "filePath": "lib/application.js",
+        "symbol": "app.use"
+      }
+    ],
+    "answerable": true,
+    "actualAnswer": "When an Express application is passed to `app.use()` the child app is **mounted** onto the parent.  \nThe mounting process does three things that are visible in the provided code:\n\n1. **Parent and mount path are set** – the child app receives a `parent` reference and a `mountpath` that is the URL prefix under which it was mounted.  \n   *The `mountpath` for a top‑level app is initialised to `'/'` in `defaultConfiguration()` (lines 90‑99 of `lib\\application.js`).  \n   *The child’s `path()` method (lines 399‑403) concatenates the parent’s path with the child’s `mountpath`, so the child knows the full path at which it is mounted.*\n\n2. **A `mount` event is emitted** – the child app emits a `mount` event when it is mounted.  \n   The handler for this event is defined in `defaultConfiguration()` (lines 94‑121 of `lib\\application.js`).\n\n3. **The event handler copies behaviour from the parent** – in the `mount` handler the child inherits several prototype objects and settings from the parent:  \n   * `this.request`, `this.response`, `this.engines`, and `this.settings` are all set to prototype objects from the parent (`Object.setPrototypeOf`).  \n   * Trust‑proxy defaults are inherited from the parent if the child still has the legacy default (`trustProxyDefaultSymbol`).  \n   * Local variables (`this.locals`) are also inherited via `Object.create(null)` in the parent’s configuration.\n\nIn short, `app.use()` mounts the child app by giving it a `parent` reference and `mountpath`, then fires a `mount` event that makes the child app inherit the parent’s request/response/engines/settings prototypes and trust‑proxy defaults.",
+    "requestSucceeded": true,
+    "latencySeconds": 76.88
+  },
+  {
+    "id": "express-008",
+    "question": "How does the callable Express application function reach app.handle()?",
+    "expectedAnswerPoints": [
+      "The application function accepts req, res, and next",
+      "The function delegates to app.handle(req, res, next)",
+      "app.handle prepares request handling and delegates to the router"
+    ],
+    "expectedEvidence": [
+      {
+        "filePath": "lib/express.js",
+        "symbol": "createApplication"
+      },
+      {
+        "filePath": "lib/application.js",
+        "symbol": "app.handle"
+      }
+    ],
+    "answerable": true,
+    "actualAnswer": "The provided code does not show this.",
+    "requestSucceeded": true,
+    "latencySeconds": 51.81
+  },
+  {
+    "id": "express-009",
+    "question": "How are HTTP method handlers such as app.get() and app.post() registered on an Express application?",
+    "expectedAnswerPoints": [
+      "Express iterates over supported HTTP methods to define application methods",
+      "The generated methods create or obtain a route for the path",
+      "The route method receives the supplied callbacks",
+      "The application method returns the app for chaining",
+      "app.get with a single argument is handled as a settings lookup"
+    ],
+    "expectedEvidence": [
+      {
+        "filePath": "lib/application.js",
+        "symbol": "methods.forEach"
+      },
+      {
+        "filePath": "lib/application.js",
+        "symbol": "app.route"
+      }
+    ],
+    "answerable": true,
+    "actualAnswer": "In Express, the HTTP‑method helpers (`app.get()`, `app.post()`, etc.) are created by looping over the list of HTTP methods (`methods`) and attaching a function to the `app` object for each one.  \nWhen one of these helpers is called, it does the following:\n\n1. **Create (or retrieve) a route for the given path** – the helper calls `this.route(path)`, which returns a route object that represents the URL path.  \n2. **Register the handler on that route** – the helper then calls the method‑specific function on the route object (`route[method]`) with the handler(s) passed as arguments.  \n   ```js\n   var route = this.route(path);\n   route[method].apply(route, slice.call(arguments, 1));\n   ```\n   This attaches the supplied handler(s) to the route for that particular HTTP method.  \n   (See `app.get`, `app.post`, etc. defined in `lib/application.js` lines 16‑22.)\n\nFor the special case of `app.all()`, the same pattern is used but it iterates over every method in `methods` and registers the same handler for each of them:\n\n```js\napp.all = function all(path) {\n  var route = this.route(path);\n  var args = slice.call(arguments, 1);\n\n  for (var i = 0; i < methods.length; i++) {\n    route[methods[i]].apply(route, args);\n  }\n\n  return this;\n};\n```\n(See `lib/application.js` lines 494‑503.)\n\nThus, HTTP method handlers are registered by adding them to a route object that is bound to the given path.",
+    "requestSucceeded": true,
+    "latencySeconds": 22.51
+  },
+  {
+    "id": "express-010",
+    "question": "How does app.all() register callbacks for a route?",
+    "expectedAnswerPoints": [
+      "Creates a route for the supplied path",
+      "Copies the callback arguments",
+      "Registers the callbacks across supported HTTP methods",
+      "Returns the application for chaining"
+    ],
+    "expectedEvidence": [
+      {
+        "filePath": "lib/application.js",
+        "symbol": "app.all"
+      }
+    ],
+    "answerable": true,
+    "actualAnswer": "The provided code does not show how `app.all()` registers callbacks for a route.",
+    "requestSucceeded": true,
+    "latencySeconds": 62.45
+  },
+  {
+    "id": "express-011",
+    "question": "How does app.path() calculate the path of a mounted sub-application?",
+    "expectedAnswerPoints": [
+      "Returns an empty string when the app has no parent",
+      "Uses the parent application's path",
+      "Combines the parent path with the mounted application's mountpath",
+      "app.use establishes the parent and mountpath relationships"
+    ],
+    "expectedEvidence": [
+      {
+        "filePath": "lib/application.js",
+        "symbol": "app.path"
+      },
+      {
+        "filePath": "lib/application.js",
+        "symbol": "app.use"
+      }
+    ],
+    "answerable": true,
+    "actualAnswer": "The provided code does not show this.",
+    "requestSucceeded": true,
+    "latencySeconds": 48.38
+  },
+  {
+    "id": "express-012",
+    "question": "How does Express expose the application through req.app and res.app?",
+    "expectedAnswerPoints": [
+      "The application is stored as an app property on request and response prototypes",
+      "app.handle assigns those prototypes to the current request and response",
+      "The properties refer to the relevant Express application"
+    ],
+    "expectedEvidence": [
+      {
+        "filePath": "lib/express.js",
+        "symbol": "createApplication"
+      },
+      {
+        "filePath": "lib/application.js",
+        "symbol": "app.handle"
+      }
+    ],
+    "answerable": true,
+    "actualAnswer": "The provided code does not show this.",
+    "requestSucceeded": true,
+    "latencySeconds": 28.92
+  },
+  {
+    "id": "express-013",
+    "question": "Which source file defines the Express request prototype, and which file assigns it during request handling?",
+    "expectedAnswerPoints": [
+      "lib/request.js defines the base request prototype",
+      "lib/express.js creates an application-specific request prototype",
+      "lib/application.js assigns the application-specific prototype during handling"
+    ],
+    "expectedEvidence": [
+      {
+        "filePath": "lib/request.js",
+        "symbol": "request prototype"
+      },
+      {
+        "filePath": "lib/express.js",
+        "symbol": "createApplication"
+      },
+      {
+        "filePath": "lib/application.js",
+        "symbol": "app.handle"
+      }
+    ],
+    "answerable": true,
+    "actualAnswer": "- **Definition of the Express request prototype**  \n  The prototype is created in `lib/request.js` with\n\n  ```js\n  var req = Object.create(http.IncomingMessage.prototype)\n  module.exports = req\n  ```\n\n  (see `lib\\request.js:16-18`). This `req` object becomes the base prototype that Express will use for request instances.\n\n- **Assignment of that prototype during request handling**  \n  The prototype is exposed on the application in `lib/express.js`:\n\n  ```js\n  app.request = Object.create(req, {\n    app: { configurable: true, enumerable: true, writable: true, value: app }\n  })\n  ```\n\n  (see `lib\\express.js:36-56`). This line makes the `req` prototype the prototype that will be used for all incoming request objects when the application processes a request.",
+    "requestSucceeded": true,
+    "latencySeconds": 16.98
+  },
+  {
+    "id": "express-014",
+    "question": "Which source file defines the Express response prototype, and how is it associated with an application?",
+    "expectedAnswerPoints": [
+      "lib/response.js defines the base response prototype",
+      "lib/express.js creates an application-specific response prototype",
+      "The application-specific prototype exposes the app property",
+      "app.handle assigns the prototype to the response"
+    ],
+    "expectedEvidence": [
+      {
+        "filePath": "lib/response.js",
+        "symbol": "response prototype"
+      },
+      {
+        "filePath": "lib/express.js",
+        "symbol": "createApplication"
+      },
+      {
+        "filePath": "lib/application.js",
+        "symbol": "app.handle"
+      }
+    ],
+    "answerable": true,
+    "actualAnswer": "The Express response prototype is defined in **`lib/response.js`**.  \nIn that file the prototype object is created from Node’s built‑in `http.ServerResponse`:\n\n```js\nvar res = Object.create(http.ServerResponse.prototype)\nmodule.exports = res\n```\n*File: lib/response.js, lines 15‑19* (shown in the provided chunk).  \n\nWhen a request is handled, Express attaches the application instance to the response object.  \nInside the prototype methods (e.g., `res.send`) the code accesses the application through `this.app`:\n\n```js\nvar app = this.app;\n```\n*File: lib/response.js, lines 126‑130* (shown in the provided chunk).  \n\nThus, the response prototype is defined in `lib/response.js` and is associated with an application by storing a reference to the `app` instance on each response object (`res.app`).",
+    "requestSucceeded": true,
+    "latencySeconds": 36.15
+  },
+  {
+    "id": "express-015",
+    "question": "Which tests cover mounting middleware and sub-applications with app.use()?",
+    "expectedAnswerPoints": [
+      "Identifies test/app.use.js as the relevant test file",
+      "Summarizes only behaviors verified by the tests",
+      "Does not invent test names or assertions"
+    ],
+    "expectedEvidence": [
+      {
+        "filePath": "test/app.use.js",
+        "symbol": "app.use tests"
+      }
+    ],
+    "answerable": true,
+    "actualAnswer": "The provided code does not show any test that specifically covers mounting middleware and sub‑applications with `app.use()`.",
+    "requestSucceeded": true,
+    "latencySeconds": 55.49
+  },
+  {
+    "id": "express-016",
+    "question": "Which tests cover application-specific request behavior?",
+    "expectedAnswerPoints": [
+      "Identifies test/app.request.js as the focused test file",
+      "Reports behaviors supported by the test contents",
+      "Does not infer exact assertions from the filename alone"
+    ],
+    "expectedEvidence": [
+      {
+        "filePath": "test/app.request.js",
+        "symbol": "request prototype tests"
+      }
+    ],
+    "answerable": true,
+    "actualAnswer": "The provided code does not show any test files, so it does not indicate which tests cover application‑specific request behavior.",
+    "requestSucceeded": true,
+    "latencySeconds": 55.39
+  },
+  {
+    "id": "express-017",
+    "question": "Which tests cover application-specific response behavior?",
+    "expectedAnswerPoints": [
+      "Identifies test/app.response.js as the focused test file",
+      "Reports behaviors supported by the test contents",
+      "Does not infer exact assertions from the filename alone"
+    ],
+    "expectedEvidence": [
+      {
+        "filePath": "test/app.response.js",
+        "symbol": "response prototype tests"
+      }
+    ],
+    "answerable": true,
+    "actualAnswer": "The only test file that is explicitly shown in the provided snippets is **`test/res.location.js`**.  \nThis file contains a set of tests that exercise `res.location()` and verify that the application sends the correct `Location` header and properly encodes URLs and data URIs. Those tests are the ones that cover application‑specific response behavior.\n\n*Evidence:*  \nThe file begins with `describe('res', function(){ ...` and contains several `it` blocks that perform HTTP requests against an Express app and check the resulting responses (Lines 3–304 in `test/res.location.js`).",
+    "requestSucceeded": true,
+    "latencySeconds": 28.17
+  },
+  {
+    "id": "express-018",
+    "question": "Where can I find tests for Express route error handling, and what should an answer use as evidence?",
+    "expectedAnswerPoints": [
+      "Identifies test/app.routes.error.js as relevant evidence",
+      "Explains behavior based on actual test cases",
+      "Distinguishes tests in this repository from implementation code in external dependencies"
+    ],
+    "expectedEvidence": [
+      {
+        "filePath": "test/app.routes.error.js",
+        "symbol": "route error handling tests"
+      }
+    ],
+    "answerable": true,
+    "actualAnswer": "The Express project’s test suite includes a dedicated file for route‑level error handling:  \n\n- **File:** `test/app.routes.error.js` (see the snippet starting at line 3)  \n\nThe snippet itself shows two tests that exercise error propagation in routes:\n\n```\nvar assert = require('node:assert')\nvar express = require('../')\n  , request = require('supertest');\ndescribe('app', function(){\n  describe('.VERB()', function(){\n    it('should not get invoked without error handler on error', function(done) {\n      var app = express();\n      ...\n    });\n    it('should only call an error handling routing callback when an error is propagated', function(done){\n      var app = express();\n      ...\n    });\n  });\n});\n```\n\nThese tests (lines 3‑62) confirm that Express correctly routes errors to the appropriate error‑handling middleware. Therefore, the test file `test/app.routes.error.js` is where you can find tests for Express route error handling, and the evidence for this is the code shown in the provided chunk.",
+    "requestSucceeded": true,
+    "latencySeconds": 29.99
+  },
+  {
+    "id": "express-019",
+    "question": "Where does this repository implement a built-in database connection pool, and how is its pool size configured?",
+    "expectedAnswerPoints": [],
+    "expectedEvidence": [],
+    "answerable": false,
+    "actualAnswer": "The provided code chunks do not show any implementation of a built‑in database connection pool, nor do they contain any configuration for a pool size.",
+    "requestSucceeded": true,
+    "latencySeconds": 54.98
+  },
+  {
+    "id": "express-020",
+    "question": "What is the default timeout of the hypothetical app.setRequestTimeout() method in this repository?",
+    "expectedAnswerPoints": [],
+    "expectedEvidence": [],
+    "answerable": false,
+    "actualAnswer": "The provided code does not show this.",
+    "requestSucceeded": true,
+    "latencySeconds": 36.87
+  }
+]

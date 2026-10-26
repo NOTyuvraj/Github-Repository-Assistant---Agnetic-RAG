@@ -2,32 +2,40 @@ import { tmpdir } from "node:os";
 import simpleGit from "simple-git";
 import path from "node:path";
 
-export const cloneRepoBranch = async (repoURL, branch = "main") => {
-  try {
-    const repoName =
-      new URL(repoURL).pathname
-        .split("/")
-        .filter(Boolean)
-        .at(-1)
-        ?.replace(/\.git$/, "") || "repository";
+export const cloneRepoBranch = async (repoURL, branch) => {
+  const repoName =
+    new URL(repoURL).pathname
+      .split("/")
+      .filter(Boolean)
+      .at(-1)
+      ?.replace(/\.git$/, "") || "repository";
 
-    const cloneDir = path.join(
-      tmpdir(),
-      "repoCloneFolder",
-      `${repoName}-${Date.now()}`,
-    );
+  const cloneDir = path.join(
+    tmpdir(),
+    "repoCloneFolder",
+    `${repoName}-${Date.now()}`,
+  );
 
-    await simpleGit().clone(repoURL, cloneDir, [
-      "--branch",
-      branch,
-      "--single-branch",
-    ]);
-    
-    const commitSha = (await simpleGit(cloneDir).revparse(["HEAD"])).trim();
+  const git = simpleGit();
 
-    return {cloneDir, commitSha};
-
-  } catch (err) {
-    throw err;
+  if (branch) {
+    await git.clone(repoURL, cloneDir, ["--branch", branch, "--single-branch"]);
+  } else {
+    // Let Git select the repository's default branch.
+    await git.clone(repoURL, cloneDir);
   }
+
+  const repoGit = simpleGit(cloneDir);
+
+  const commitSha = (await repoGit.revparse(["HEAD"])).trim();
+
+  const currentBranch = (
+    await repoGit.revparse(["--abbrev-ref", "HEAD"])
+  ).trim();
+
+  return {
+    cloneDir,
+    commitSha,
+    branch: currentBranch,
+  };
 };

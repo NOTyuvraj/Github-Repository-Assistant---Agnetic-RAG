@@ -1,5 +1,3 @@
-
-
 import dotenv from "dotenv/config";
 
 import express from "express";
@@ -19,21 +17,21 @@ app.use(
 app.use(express.json());
 
 app.post("/ingest", async (req, res) => {
-  const { repoURL, branch = "main" } = req.body;
+  const { repoURL, branch } = req.body;
   if (!repoURL) return res.status(400).json({ error: "url is required" });
 
   try {
     const result = await ingestionOrchestrator(repoURL, branch);
     return res.json({ success: true, ...result });
   } catch (err) {
-  console.error("Orchestrator error:");
-  console.error(err);
-  return res.status(500).json({ error: err.message });
-}
+    console.error("Orchestrator error:");
+    console.error(err);
+    return res.status(500).json({ error: err.message });
+  }
 });
 
 app.post("/refresh", async (req, res) => {
-  const { repoURL, branch = "main" } = req.body;
+  const { repoURL, branch } = req.body;
   if (!repoURL) {
     return res.status(400).json({ error: "repoURL is required" });
   }
@@ -48,20 +46,18 @@ app.post("/refresh", async (req, res) => {
 });
 
 app.post("/ask", async (req, res) => {
-  const { query , sessionId} = req.body;
+  const { query, sessionId } = req.body;
   if (!query) return res.status(400).json({ error: "query is required" });
 
   try {
-    res.send(await agent(query , sessionId));
-  }  catch (err) {
-  console.error("Ask error:", err);
-  res.status(500).json({ error: err.message });
-}
+    res.send(await agent(query, sessionId));
+  } catch (err) {
+    console.error("Ask error:", err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
-
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
 
 // {
 //     "success": true,

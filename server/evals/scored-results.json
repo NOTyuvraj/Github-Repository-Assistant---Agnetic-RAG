@@ -1,0 +1,500 @@
+[
+  {
+    "id": "express-001",
+    "question": "How does Express create an application instance?",
+    "coverage": 1.0,
+    "point_scores": [
+      {
+        "index": 0,
+        "score": 2,
+        "reason": "Answer explicitly states that a callable function is defined as the application."
+      },
+      {
+        "index": 1,
+        "score": 2,
+        "reason": "Answer describes mixing in EventEmitter and Express prototype methods via mixin."
+      },
+      {
+        "index": 2,
+        "score": 2,
+        "reason": "Answer explains creation of app.request and app.response prototypes inheriting from req/res."
+      },
+      {
+        "index": 3,
+        "score": 2,
+        "reason": "Answer notes that app.init() is called before returning the app."
+      }
+    ],
+    "latencySeconds": null
+  },
+  {
+    "id": "express-002",
+    "question": "How are app.request and app.response created, and how does each expose its application?",
+    "coverage": 1.0,
+    "point_scores": [
+      {
+        "index": 0,
+        "score": 2,
+        "reason": "The answer explicitly states that app.request is created with Object.create using the request prototype."
+      },
+      {
+        "index": 1,
+        "score": 2,
+        "reason": "The answer explicitly states that app.response is created with Object.create using the response prototype."
+      },
+      {
+        "index": 2,
+        "score": 2,
+        "reason": "The answer shows that both app.request and app.response define an own property 'app' pointing to the application instance."
+      }
+    ],
+    "latencySeconds": null
+  },
+  {
+    "id": "express-003",
+    "question": "What does app.handle() do before delegating a request to the router?",
+    "coverage": 1.0,
+    "point_scores": [
+      {
+        "index": 0,
+        "score": 2,
+        "reason": "Actual answer explicitly creates finalhandler callback when none provided."
+      },
+      {
+        "index": 1,
+        "score": 2,
+        "reason": "Actual answer shows req.res = res and res.req = req."
+      },
+      {
+        "index": 2,
+        "score": 2,
+        "reason": "Actual answer changes prototypes to app.request and app.response."
+      },
+      {
+        "index": 3,
+        "score": 2,
+        "reason": "Actual answer initializes res.locals if missing."
+      },
+      {
+        "index": 4,
+        "score": 2,
+        "reason": "Actual answer delegates to this.router.handle(req, res, done)."
+      }
+    ],
+    "latencySeconds": null
+  },
+  {
+    "id": "express-004",
+    "question": "How does app.use() parse its mount path and middleware arguments?",
+    "coverage": 1.0,
+    "point_scores": [
+      {
+        "index": 0,
+        "score": 2,
+        "reason": "Default mount path '/' when first arg not a path is described."
+      },
+      {
+        "index": 1,
+        "score": 2,
+        "reason": "Separates mount path from middleware by checking first arg."
+      },
+      {
+        "index": 2,
+        "score": 2,
+        "reason": "Flattens middleware arguments via recursive flatten."
+      },
+      {
+        "index": 3,
+        "score": 2,
+        "reason": "Rejects invalid middleware by throwing TypeError if none."
+      },
+      {
+        "index": 4,
+        "score": 2,
+        "reason": "Registers middleware with router as described."
+      }
+    ],
+    "latencySeconds": null
+  },
+  {
+    "id": "express-005",
+    "question": "How does Express handle an error when app.handle() is called without a completion callback?",
+    "coverage": 0.75,
+    "point_scores": [
+      {
+        "index": 0,
+        "score": 2,
+        "reason": "covers creation of finalhandler when no callback supplied"
+      },
+      {
+        "index": 1,
+        "score": 2,
+        "reason": "shows completion handler passed to router"
+      },
+      {
+        "index": 2,
+        "score": 0,
+        "reason": "does not mention route error tests"
+      },
+      {
+        "index": 3,
+        "score": 2,
+        "reason": "does not claim router implementation defined in repo"
+      }
+    ],
+    "latencySeconds": null
+  },
+  {
+    "id": "express-006",
+    "question": "How do application creation and request handling work together to provide app-specific request and response behavior?",
+    "coverage": 1.0,
+    "point_scores": [
+      {
+        "index": 0,
+        "score": 2,
+        "reason": "Answer explicitly states that createApplication builds app.request and app.response prototypes during app creation."
+      },
+      {
+        "index": 1,
+        "score": 2,
+        "reason": "Answer explains that app.request and app.response are created with an app property pointing back to the app."
+      },
+      {
+        "index": 2,
+        "score": 2,
+        "reason": "Answer details that app.handle sets the prototypes of req and res to this.request and this.response."
+      },
+      {
+        "index": 3,
+        "score": 2,
+        "reason": "Answer notes that app.handle passes control to the router."
+      }
+    ],
+    "latencySeconds": null
+  },
+  {
+    "id": "express-007",
+    "question": "What does Express do when app.use() mounts another Express application?",
+    "coverage": 1.0,
+    "point_scores": [
+      {
+        "index": 0,
+        "score": 2,
+        "reason": "Answer explicitly states Express recognizes a mounted app by checking for handle and set methods."
+      },
+      {
+        "index": 1,
+        "score": 2,
+        "reason": "Answer details assigning mountpath and parent to the child app."
+      },
+      {
+        "index": 2,
+        "score": 2,
+        "reason": "Answer describes registering a wrapper middleware that calls the child app’s handle."
+      },
+      {
+        "index": 3,
+        "score": 2,
+        "reason": "Answer mentions restoring request/response prototypes after child finishes."
+      },
+      {
+        "index": 4,
+        "score": 2,
+        "reason": "Answer notes emitting a 'mount' event on the child app."
+      }
+    ],
+    "latencySeconds": null
+  },
+  {
+    "id": "express-008",
+    "question": "How does the callable Express application function reach app.handle()?",
+    "coverage": 0.8333333333333334,
+    "point_scores": [
+      {
+        "index": 0,
+        "score": 2,
+        "reason": "The answer explicitly states the application function signature includes req, res, next."
+      },
+      {
+        "index": 1,
+        "score": 2,
+        "reason": "The answer shows the function delegates to app.handle(req, res, next)."
+      },
+      {
+        "index": 2,
+        "score": 1,
+        "reason": "The answer does not describe app.handle preparing request handling or delegating to the router."
+      }
+    ],
+    "latencySeconds": null
+  },
+  {
+    "id": "express-009",
+    "question": "How are HTTP method handlers such as app.get() and app.post() registered on an Express application?",
+    "coverage": 0.8,
+    "point_scores": [
+      {
+        "index": 0,
+        "reason": "Answer explicitly states Express iterates over supported methods to define app methods",
+        "score": 2
+      },
+      {
+        "index": 1,
+        "reason": "Answer describes creation or retrieval of a Route object via this.route(path)",
+        "score": 2
+      },
+      {
+        "index": 2,
+        "reason": "Answer shows route[method].apply(...) registering callbacks",
+        "score": 2
+      },
+      {
+        "index": 3,
+        "reason": "Answer does not mention return value for chaining",
+        "score": 0
+      },
+      {
+        "index": 4,
+        "reason": "Answer notes single-argument get is a settings lookup",
+        "score": 2
+      }
+    ],
+    "latencySeconds": null
+  },
+  {
+    "id": "express-010",
+    "question": "How does app.all() register callbacks for a route?",
+    "coverage": 0.75,
+    "point_scores": [
+      {
+        "index": 0,
+        "score": 2,
+        "reason": "The answer explicitly states that it obtains a Route object for the given path by calling this.route(path)."
+      },
+      {
+        "index": 1,
+        "score": 2,
+        "reason": "It collects the remaining arguments into args, effectively copying the callbacks."
+      },
+      {
+        "index": 2,
+        "score": 2,
+        "reason": "It iterates over the HTTP methods and invokes each method on the route with the callbacks, registering them for all methods."
+      },
+      {
+        "index": 3,
+        "score": 0,
+        "reason": "The answer does not mention returning the application for chaining."
+      }
+    ],
+    "latencySeconds": null
+  },
+  {
+    "id": "express-011",
+    "question": "How does app.path() calculate the path of a mounted sub-application?",
+    "coverage": 0.75,
+    "point_scores": [
+      {
+        "index": 0,
+        "score": 2,
+        "reason": "covers empty string when no parent"
+      },
+      {
+        "index": 1,
+        "score": 2,
+        "reason": "uses parent path"
+      },
+      {
+        "index": 2,
+        "score": 2,
+        "reason": "combines parent path with mountpath"
+      },
+      {
+        "index": 3,
+        "score": 0,
+        "reason": "missing mention of app.use establishing relationships"
+      }
+    ],
+    "latencySeconds": null
+  },
+  {
+    "id": "express-012",
+    "question": "How does Express expose the application through req.app and res.app?",
+    "coverage": 1.0,
+    "point_scores": [
+      {
+        "index": 0,
+        "score": 2,
+        "reason": "Answer explicitly states prototypes contain an app property."
+      },
+      {
+        "index": 1,
+        "score": 2,
+        "reason": "Answer describes app.handle assigning prototypes to req/res."
+      },
+      {
+        "index": 2,
+        "score": 2,
+        "reason": "Answer explains req.app/res.app refer to the Express application."
+      }
+    ],
+    "latencySeconds": null
+  },
+  {
+    "id": "express-013",
+    "question": "Which source file defines the Express request prototype, and which file assigns it during request handling?",
+    "coverage": 0.3333333333333333,
+    "point_scores": [
+      {
+        "index": 0,
+        "score": 2,
+        "reason": "covers point"
+      },
+      {
+        "index": 1,
+        "score": 0,
+        "reason": "missing"
+      },
+      {
+        "index": 2,
+        "score": 0,
+        "reason": "missing"
+      }
+    ],
+    "latencySeconds": null
+  },
+  {
+    "id": "express-014",
+    "question": "Which source file defines the Express response prototype, and how is it associated with an application?",
+    "coverage": 0.0,
+    "point_scores": [
+      {
+        "index": 0,
+        "score": 0,
+        "reason": "Answer does not mention lib/response.js or that it defines the base response prototype."
+      },
+      {
+        "index": 1,
+        "score": 0,
+        "reason": "Answer does not mention lib/express.js creating an application-specific response prototype."
+      },
+      {
+        "index": 2,
+        "score": 0,
+        "reason": "Answer does not mention the application-specific prototype exposing the app property."
+      },
+      {
+        "index": 3,
+        "score": 0,
+        "reason": "Answer does not mention app.handle assigning the prototype to the response."
+      }
+    ],
+    "latencySeconds": null
+  },
+  {
+    "id": "express-015",
+    "question": "Which tests cover mounting middleware and sub-applications with app.use()?",
+    "coverage": 1.0,
+    "point_scores": [
+      {
+        "index": 0,
+        "score": 2,
+        "reason": "Correctly identifies test/app.use.js as the relevant test file."
+      },
+      {
+        "index": 1,
+        "score": 2,
+        "reason": "Summarizes only the behaviors verified by the tests, listing each test description and location."
+      },
+      {
+        "index": 2,
+        "score": 2,
+        "reason": "Does not invent any test names or assertions; all listed tests correspond to actual test names."
+      }
+    ],
+    "latencySeconds": null
+  },
+  {
+    "id": "express-016",
+    "question": "Which tests cover application-specific request behavior?",
+    "coverage": 0.6666666666666666,
+    "point_scores": [
+      {
+        "index": 0,
+        "score": 0,
+        "reason": "Missing explicit reference to test/app.request.js"
+      },
+      {
+        "index": 1,
+        "score": 2,
+        "reason": "Describes behaviors supported by the test contents"
+      },
+      {
+        "index": 2,
+        "score": 2,
+        "reason": "Does not infer exact assertions from the filename alone"
+      }
+    ],
+    "latencySeconds": null
+  },
+  {
+    "id": "express-017",
+    "question": "Which tests cover application-specific response behavior?",
+    "coverage": 1.0,
+    "point_scores": [
+      {
+        "index": 0,
+        "score": 2,
+        "reason": "Explicitly identifies test\\app.response.js as the focused test file."
+      },
+      {
+        "index": 1,
+        "score": 2,
+        "reason": "Describes the three behaviors tested in the file."
+      },
+      {
+        "index": 2,
+        "score": 2,
+        "reason": "Does not infer assertions solely from filename; provides content details."
+      }
+    ],
+    "latencySeconds": null
+  },
+  {
+    "id": "express-018",
+    "question": "Where can I find tests for Express route error handling, and what should an answer use as evidence?",
+    "coverage": 0.3333333333333333,
+    "point_scores": [
+      {
+        "index": 0,
+        "score": 0,
+        "reason": "does not mention test/app.routes.error.js"
+      },
+      {
+        "index": 1,
+        "score": 2,
+        "reason": "explains behavior based on test cases"
+      },
+      {
+        "index": 2,
+        "score": 0,
+        "reason": "does not distinguish tests from external dependencies"
+      }
+    ],
+    "latencySeconds": null
+  },
+  {
+    "id": "express-019",
+    "question": "Where does this repository implement a built-in database connection pool, and how is its pool size configured?",
+    "coverage": null,
+    "point_scores": [],
+    "latencySeconds": null
+  },
+  {
+    "id": "express-020",
+    "question": "What is the default timeout of the hypothetical app.setRequestTimeout() method in this repository?",
+    "coverage": null,
+    "point_scores": [],
+    "latencySeconds": null
+  }
+]

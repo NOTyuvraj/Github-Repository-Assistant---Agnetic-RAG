@@ -7,6 +7,7 @@ import { cloneRepoBranch } from "./cloner.js";
 import { embedder } from "./embedder.js";
 import { filter } from "./filter.js";
 import { getIndexMetadata, saveIndexMetadata } from "./indexMetadata.store.js";
+import { indexLexicalChunks } from "./lexicalIndexer.js";
 
 const refreshLocks = new Map();
 
@@ -65,28 +66,44 @@ const replaceNamespace = async (sessionId, chunks) => {
   }
 };
 
-export const ingestionOrchestrator = async (repoURL, branch = "main") => {
+export const ingestionOrchestrator = async (repoURL, branch) => {
   const normalisedRepoURL = normaliseRepositoryUrl(repoURL);
-  const identity = `${normalisedRepoURL}#${branch}`;
-  const sessionId = namespaceFor(identity);
 
-  return withRefreshLock(identity, async () => {
+  // Lock by repository because the default branch is not known yet.
+  return withRefreshLock(normalisedRepoURL, async () => {
     let cloneDir;
 
     try {
+      // Clone first so we know the actual branch.
       const clone = await cloneRepoBranch(normalisedRepoURL, branch);
       cloneDir = clone.cloneDir;
 
+      const actualBranch = clone.branch;
+      const identity = `${normalisedRepoURL}#${actualBranch}`;
+      const sessionId = namespaceFor(identity);
+
       const previous = await getIndexMetadata(identity);
 
-      // Retry-safe: same commit does not re-embed anything.
       if (previous?.commitSha === clone.commitSha) {
+        const files = await filter(cloneDir);
+        const chunks = [];
+
+        for (const file of files) {
+          chunks.push(...(await chunker(file)));
+        }
+
+        for (const chunk of chunks) {
+          chunk.filePath = path.relative(cloneDir, chunk.filePath);
+        }
+
+        await indexLexicalChunks(sessionId, chunks);
+
         return {
           sessionId,
-          branch,
+          branch: actualBranch,
           commitSha: clone.commitSha,
           updated: false,
-          chunksIndexed: previous.chunksIndexed ?? 0,
+          chunksIndexed: previous.chunksIndexed ?? chunks.length,
         };
       }
 
@@ -102,17 +119,17 @@ export const ingestionOrchestrator = async (repoURL, branch = "main") => {
       }
 
       await replaceNamespace(sessionId, chunks);
+      await indexLexicalChunks(sessionId, chunks);
 
       const metadata = {
         repoURL: normalisedRepoURL,
-        branch,
+        branch: actualBranch,
         sessionId,
         commitSha: clone.commitSha,
         chunksIndexed: chunks.length,
         indexedAt: new Date().toISOString(),
       };
 
-      // Save only after Pinecone succeeds.
       await saveIndexMetadata(identity, metadata);
 
       return { ...metadata, updated: true };

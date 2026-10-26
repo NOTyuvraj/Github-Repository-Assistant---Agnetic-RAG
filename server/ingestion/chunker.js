@@ -65,5 +65,24 @@ export const chunker = async (filePath) => {
       return [];
   }
 
-  return splitLargeChunks(chunks);
+  const finalChunks = splitLargeChunks(chunks);
+
+  // DEBUG: inspect chunks for lib/application.js
+  if (filePath.endsWith("lib/application.js")) {
+    console.log("\n========== APPLICATION.JS CHUNKS ==========");
+
+    finalChunks.forEach((chunk, i) => {
+      console.log(`\n--- CHUNK ${i + 1} ---`);
+      console.log("Name:", chunk.name);
+      console.log("Start:", chunk.startLine);
+      console.log("End:", chunk.endLine);
+      console.log("Length:", chunk.text.length);
+      console.log("Contains app.use:", chunk.text.includes("app.use"));
+      console.log(chunk.text);
+    });
+
+    console.log("===========================================\n");
+  }
+
+  return finalChunks;
 };
